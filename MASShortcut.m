@@ -3,10 +3,7 @@
 NSString *const MASShortcutKeyCode = @"KeyCode";
 NSString *const MASShortcutModifierFlags = @"ModifierFlags";
 
-@implementation MASShortcut {
-    NSUInteger _keyCode; // NSNotFound if empty
-    NSUInteger _modifierFlags; // 0 if empty
-}
+@implementation MASShortcut
 
 @synthesize modifierFlags = _modifierFlags;
 @synthesize keyCode = _keyCode;
@@ -47,18 +44,23 @@ NSString *const MASShortcutModifierFlags = @"ModifierFlags";
 
 + (MASShortcut *)shortcutWithKeyCode:(NSUInteger)code modifierFlags:(NSUInteger)flags
 {
-    return [[self alloc] initWithKeyCode:code modifierFlags:flags];
+    return [[[self alloc] initWithKeyCode:code modifierFlags:flags] autorelease];
 }
 
 + (MASShortcut *)shortcutWithEvent:(NSEvent *)event
 {
-    return [[self alloc] initWithKeyCode:event.keyCode modifierFlags:event.modifierFlags];
+    return [[[self alloc] initWithKeyCode:event.keyCode modifierFlags:event.modifierFlags] autorelease];
 }
 
 + (MASShortcut *)shortcutWithData:(NSData *)data
 {
     id shortcut = (data ? [NSKeyedUnarchiver unarchiveObjectWithData:data] : nil);
     return shortcut;
+}
+
+
+- (void)dealloc {
+    [super dealloc];
 }
 
 #pragma mark - Shortcut accessors

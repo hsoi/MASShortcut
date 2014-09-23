@@ -31,7 +31,10 @@ enum {
 	kMASShortcutGlyphSoutheastArrow = 0x2198,
 } MASShortcutGlyph;
 
-@interface MASShortcut : NSObject <NSSecureCoding>
+@interface MASShortcut : NSObject <NSSecureCoding> {
+    NSUInteger _keyCode; // NSNotFound if empty
+    NSUInteger _modifierFlags; // 0 if empty
+}
 
 @property (nonatomic) NSUInteger keyCode;
 @property (nonatomic) NSUInteger modifierFlags;

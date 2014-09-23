@@ -2,10 +2,16 @@
 #import "MASShortcut.h"
 #import <objc/runtime.h>
 
-@interface MASShortcutDefaultsObserver : NSObject
+@interface MASShortcutDefaultsObserver : NSObject {
+    MASShortcut *_originalShortcut;
+    BOOL _internalPreferenceChange;
+    BOOL _internalShortcutChange;
+    MASShortcutView* _shortcutView;
+    NSString* _userDefaultsKey;
+}
 
 @property (nonatomic, readonly) NSString *userDefaultsKey;
-@property (nonatomic, readonly, weak) MASShortcutView *shortcutView;
+@property (nonatomic, readonly, retain) MASShortcutView *shortcutView;
 
 - (id)initWithShortcutView:(MASShortcutView *)shortcutView userDefaultsKey:(NSString *)userDefaultsKey;
 
@@ -31,7 +37,7 @@ void *MASAssociatedDefaultsObserver = &MASAssociatedDefaultsObserver;
     if (associatedUserDefaultsKey.length == 0) return;
 
     // Next, start observing current shortcut view
-    MASShortcutDefaultsObserver *defaultsObserver = [[MASShortcutDefaultsObserver alloc] initWithShortcutView:self userDefaultsKey:associatedUserDefaultsKey];
+    MASShortcutDefaultsObserver *defaultsObserver = [[[MASShortcutDefaultsObserver alloc] initWithShortcutView:self userDefaultsKey:associatedUserDefaultsKey] autorelease];
     objc_setAssociatedObject(self, MASAssociatedDefaultsObserver, defaultsObserver, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -39,11 +45,10 @@ void *MASAssociatedDefaultsObserver = &MASAssociatedDefaultsObserver;
 
 #pragma mark -
 
-@implementation MASShortcutDefaultsObserver {
-    MASShortcut *_originalShortcut;
-    BOOL _internalPreferenceChange;
-    BOOL _internalShortcutChange;
-}
+@implementation MASShortcutDefaultsObserver
+
+@synthesize userDefaultsKey = _userDefaultsKey;
+@synthesize shortcutView = _shortcutView;
 
 - (id)initWithShortcutView:(MASShortcutView *)shortcutView userDefaultsKey:(NSString *)userDefaultsKey
 {
@@ -59,8 +64,12 @@ void *MASAssociatedDefaultsObserver = &MASAssociatedDefaultsObserver;
 
 - (void)dealloc
 {
+    [_shortcutView release];
+    [_userDefaultsKey release];
     // __weak _shortcutView is not yet deallocated because it refers MASShortcutDefaultsObserver
     [self stopObservingShortcutView];
+    
+    [super dealloc];
 }
 
 #pragma mark -
