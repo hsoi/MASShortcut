@@ -14,10 +14,10 @@ void UninstallEventHandler(void);
     UInt32 _carbonHotKeyID;
 }
 
-@property (nonatomic, readonly, retain) MASShortcut *shortcut;
-@property (nonatomic, readonly, copy) void (^handler)();
-@property (nonatomic, readonly) EventHotKeyRef carbonHotKey;
-@property (nonatomic, readonly) UInt32 carbonHotKeyID;
+@property (nonatomic, retain) MASShortcut *shortcut;
+@property (nonatomic, copy) void (^handler)();
+@property (nonatomic) EventHotKeyRef carbonHotKey;
+@property (nonatomic) UInt32 carbonHotKeyID;
 
 - (id)initWithShortcut:(MASShortcut *)shortcut handler:(void (^)())handler;
 - (void)uninstallExistingHotKey;
@@ -44,13 +44,11 @@ void UninstallEventHandler(void);
 {
     if (monitor == nil) return;
     NSMutableDictionary *registeredHotKeys = MASRegisteredHotKeys();
-    /*
     MASShortcutHotKey *hotKey = [registeredHotKeys objectForKey: monitor];
     if (hotKey)
     {
         [hotKey uninstallExistingHotKey];
     }
-    */
     [registeredHotKeys removeObjectForKey:monitor];
     if (registeredHotKeys.count == 0) {
         UninstallEventHandler();

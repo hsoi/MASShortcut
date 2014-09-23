@@ -9,7 +9,7 @@
     NSString *_observableKeyPath;
 }
 
-@property (nonatomic, readonly) NSString *userDefaultsKey;
+@property (nonatomic, copy) NSString *userDefaultsKey;
 @property (nonatomic, copy) void (^handler)();
 @property (nonatomic, retain) id monitor;
 @property (nonatomic, copy) NSString* observableKeyPath;
@@ -34,7 +34,7 @@
 
 + (void)registerGlobalShortcutWithUserDefaultsKey:(NSString *)userDefaultsKey handler:(void (^)())handler;
 {
-    MASShortcutUserDefaultsHotKey *hotKey = [[[MASShortcutUserDefaultsHotKey alloc] initWithUserDefaultsKey:userDefaultsKey handler:handler] autorelease];
+    MASShortcutUserDefaultsHotKey *hotKey = [[MASShortcutUserDefaultsHotKey alloc] initWithUserDefaultsKey:userDefaultsKey handler:handler]; // yes, don't autorelease.
     [[self registeredUserDefaultsHotKeys] setObject:hotKey forKey:userDefaultsKey];
 }
 
@@ -71,7 +71,7 @@ void *MASShortcutUserDefaultsContext = &MASShortcutUserDefaultsContext;
 {
     self = [super init];
     if (self) {
-        _userDefaultsKey = userDefaultsKey.copy;
+        _userDefaultsKey = [userDefaultsKey copy];
         _handler = [handler copy];
         _observableKeyPath = [[@"values." stringByAppendingString:_userDefaultsKey] copy];
         [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:_observableKeyPath options:NSKeyValueObservingOptionInitial context:MASShortcutUserDefaultsContext];

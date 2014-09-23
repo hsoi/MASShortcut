@@ -10,8 +10,9 @@
     NSString* _userDefaultsKey;
 }
 
-@property (nonatomic, readonly) NSString *userDefaultsKey;
-@property (nonatomic, readonly, retain) MASShortcutView *shortcutView;
+@property (nonatomic, retain) MASShortcut* originalShortcut;
+@property (nonatomic, copy) NSString *userDefaultsKey;
+@property (nonatomic, retain) MASShortcutView *shortcutView;
 
 - (id)initWithShortcutView:(MASShortcutView *)shortcutView userDefaultsKey:(NSString *)userDefaultsKey;
 
@@ -47,6 +48,7 @@ void *MASAssociatedDefaultsObserver = &MASAssociatedDefaultsObserver;
 
 @implementation MASShortcutDefaultsObserver
 
+@synthesize originalShortcut = _originalShortcut;
 @synthesize userDefaultsKey = _userDefaultsKey;
 @synthesize shortcutView = _shortcutView;
 
@@ -54,9 +56,9 @@ void *MASAssociatedDefaultsObserver = &MASAssociatedDefaultsObserver;
 {
     self = [super init];
     if (self) {
-        _originalShortcut = shortcutView.shortcutValue;
-        _shortcutView = shortcutView;
-        _userDefaultsKey = userDefaultsKey.copy;
+        _originalShortcut = [shortcutView.shortcutValue retain];
+        _shortcutView = [shortcutView retain];
+        _userDefaultsKey = [userDefaultsKey copy];
         [self startObservingShortcutView];
     }
     return self;
@@ -64,10 +66,12 @@ void *MASAssociatedDefaultsObserver = &MASAssociatedDefaultsObserver;
 
 - (void)dealloc
 {
-    [_shortcutView release];
-    [_userDefaultsKey release];
     // __weak _shortcutView is not yet deallocated because it refers MASShortcutDefaultsObserver
     [self stopObservingShortcutView];
+
+    [_originalShortcut release];
+    [_shortcutView release];
+    [_userDefaultsKey release];
     
     [super dealloc];
 }
